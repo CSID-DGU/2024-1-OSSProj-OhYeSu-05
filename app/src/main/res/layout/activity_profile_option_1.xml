@@ -74,7 +74,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@id/activity"
+        android:id="@id/m"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
@@ -98,7 +98,7 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:id="@+id/activity_High"
+                android:id="@+id/m_E"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -108,7 +108,7 @@
 
 
             <Button
-                android:id="@+id/activity_Low"
+                android:id="@+id/m_I"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -117,14 +117,14 @@
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/think"
+        android:id="@+id/b"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="35dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/activity">
+        app:layout_constraintTop_toBottomOf="@+id/m">
 
         <TextView
             android:layout_width="wrap_content"
@@ -140,7 +140,7 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:id="@+id/think_High"
+                android:id="@+id/b_S"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -149,7 +149,7 @@
                 android:textColor="@color/text_main" />
 
             <Button
-                android:id="@+id/think_Low"
+                android:id="@+id/b_N"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -159,14 +159,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/emotion"
+        android:id="@+id/t"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="35dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/think">
+        app:layout_constraintTop_toBottomOf="@+id/b">
 
         <TextView
             android:layout_width="wrap_content"
@@ -182,7 +182,7 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:id="@+id/emotion_Low"
+                android:id="@+id/t_T"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -191,7 +191,7 @@
                 android:textColor="@color/text_main" />
 
             <Button
-                android:id="@+id/emotion_High"
+                android:id="@+id/t_F"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -201,14 +201,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/pattern"
+        android:id="@+id/i"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="35dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/emotion">
+        app:layout_constraintTop_toBottomOf="@+id/t">
 
         <TextView
             android:layout_width="wrap_content"
@@ -224,7 +224,7 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:id="@+id/pattern_High"
+                android:id="@+id/i_J"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -233,7 +233,7 @@
                 android:textColor="@color/text_main" />
 
             <Button
-                android:id="@+id/pattern_Low"
+                android:id="@+id/i_P"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

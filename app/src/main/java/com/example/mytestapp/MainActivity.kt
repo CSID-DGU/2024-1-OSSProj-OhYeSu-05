@@ -4,37 +4,32 @@ import MyPageFragment
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
-import com.example.mytestapp.chat.ChatFragment
+import com.example.mytestapp.chat.ChatHistoryFragment
 import com.example.mytestapp.databinding.ActivityMainBinding
 import com.example.mytestapp.match.MatchingFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
-    private val frame: FragmentContainerView by lazy { // activity_main의 화면 부분
-        findViewById(R.id.main_container)
-    }
+    private lateinit var binding: ActivityMainBinding
 
-    private val bottomNagivationView: BottomNavigationView by lazy { // 하단 네비게이션 바
-        findViewById(R.id.bnv_main)
-    }
-    private lateinit var binding1: ActivityMainBinding
+    private lateinit var userID: String
+    private lateinit var userName: String
+    private lateinit var userStudentID: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        binding1 = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding1.root)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val userid = intent.getStringExtra("userid")
+        // 로그인 화면에서 전달된 사용자 정보를 저장
+        userID = intent.getStringExtra("userid") ?: "unknownID"
+        userName = intent.getStringExtra("username") ?: "unknownName"
+        userStudentID = intent.getStringExtra("studentid") ?: "unknownStudentID"
 
-        if (frame == null) {
-            supportFragmentManager.beginTransaction()
-                .add(frame.id, ChatFragment())
-                .commit()
-        }
-        replaceFragment(HomeFragment()) // 기본 화면이 홈 화면
+        // 기본 프래그먼트 설정
+        replaceFragment(HomeFragment())
 
-        bottomNagivationView.setOnNavigationItemSelectedListener {item ->
+        // 하단 네비게이션 설정
+        binding.bnvMain.setOnNavigationItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.nav_home -> {
                     replaceFragment(HomeFragment())
@@ -45,11 +40,11 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_chat -> {
-                    replaceFragment(ChatFragment())
+                    replaceFragment(ChatHistoryFragment())
                     true
                 }
                 R.id.nav_mypage -> {
-                    replaceFragment(MyPageFragment())
+                    navigateToMyPageFragment()
                     true
                 }
                 else -> false
@@ -57,7 +52,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().replace(frame.id, fragment).commit()
+    private fun navigateToMyPageFragment() {
+        // 사용자 정보를 기반으로 Bundle 생성
+        val bundle = Bundle().apply {
+            putString("name", userName)
+            putString("studentId", userStudentID)
+        }
+
+        // MyPageFragment 인스턴스 생성 및 전환
+        val myPageFragment = MyPageFragment().apply {
+            arguments = bundle
+        }
+        replaceFragment(myPageFragment)
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.main_container, fragment).commit()
     }
 }

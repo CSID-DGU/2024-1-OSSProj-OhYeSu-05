@@ -18,11 +18,13 @@
     <color name="gray">#D3D3D3</color>
 
 
+
     <!--텍스트-->
     <color name="text_main">#131314</color>
     <color name="gray_light">#b5b8ba</color>
     <color name="text_white">#ffffff</color>
     <color name="error">#D9534F</color>
     <color name="gray_dark">#494a4b</color>
+    <color name="text_gray1">#808080</color>
 
 </resources>

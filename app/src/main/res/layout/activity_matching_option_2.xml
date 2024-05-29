@@ -96,7 +96,7 @@
             android:layout_marginTop="30dp" />
 
         <RadioGroup
-            android:id="@+id/sharing_radio_group"
+            android:id="@+id/Y_sharing_daily_needs_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -105,7 +105,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/sharing_yes"
+                android:id="@+id/Y_sharing_yes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="O"
@@ -113,7 +113,7 @@
                 android:layout_marginEnd="150dp"/>
 
             <RadioButton
-                android:id="@+id/sharing_no"
+                android:id="@+id/Y_sharing_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="X"
@@ -133,7 +133,7 @@
             android:layout_marginTop="30dp" />
 
         <RadioGroup
-            android:id="@+id/calling_radio_group"
+            android:id="@+id/Y_internal_communication_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -142,7 +142,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/calling_yes"
+                android:id="@+id/Y_internal_communication_yes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="O"
@@ -150,7 +150,7 @@
                 android:layout_marginEnd="150dp"/>
 
             <RadioButton
-                android:id="@+id/calling_no"
+                android:id="@+id/Y_internal_communication_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="X"
@@ -170,7 +170,7 @@
             android:layout_marginTop="30dp" />
 
         <RadioGroup
-            android:id="@+id/hottemp_radio_group"
+            android:id="@+id/Y_heat_sensitive_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -179,7 +179,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/hottemp_yes"
+                android:id="@+id/Y_heat_sensitive_yes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="O"
@@ -187,7 +187,7 @@
                 android:layout_marginEnd="150dp"/>
 
             <RadioButton
-                android:id="@+id/hottemp_no"
+                android:id="@+id/Y_heat_sensitive_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="X"
@@ -207,7 +207,7 @@
             android:layout_marginTop="30dp" />
 
         <RadioGroup
-            android:id="@+id/coldtemp_radio_group"
+            android:id="@+id/Y_cold_sensitive_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -216,7 +216,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/coldtemp_yes"
+                android:id="@+id/Y_cold_sensitive_yes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="O"
@@ -224,7 +224,7 @@
                 android:layout_marginEnd="150dp"/>
 
             <RadioButton
-                android:id="@+id/coldtemp_no"
+                android:id="@+id/Y_cold_sensitive_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="X"

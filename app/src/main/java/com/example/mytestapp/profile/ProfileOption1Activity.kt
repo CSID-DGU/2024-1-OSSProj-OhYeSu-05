@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mytestapp.MainActivity
 import com.example.mytestapp.R
-//import com.example.mytestapp.ProfileGenderActivity
 import com.example.mytestapp.databinding.ActivityProfileOption1Binding
 
 
@@ -14,10 +13,10 @@ class ProfileOption1Activity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileOption1Binding // 변경된 부분
 
     // 변수 초기화
-    private var activityValue = 0
-    private var thinkValue = 0
-    private var emotionValue = 0
-    private var patternValue = 0
+    private var mValue = -1
+    private var bValue = -1
+    private var tValue = -1
+    private var iValue = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,51 +24,51 @@ class ProfileOption1Activity : AppCompatActivity() {
         setContentView(binding.root)
 
         // 외향형(E) / 내향형(I) 버튼
-        binding.activityHigh.setOnClickListener {
-            activityValue = 1 // 외향형 선택 시 값 설정
-            binding.activityHigh.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
-            binding.activityLow.setBackgroundResource(R.drawable.option_bar_right) // 내향형 버튼의 배경 초기화
+        binding.mE.setOnClickListener {
+            mValue = 1 // 외향형 선택 시 값 설정
+            binding.mE.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
+            binding.mI.setBackgroundResource(R.drawable.option_bar_right) // 내향형 버튼의 배경 초기화
         }
-        binding.activityLow.setOnClickListener {
-            activityValue = 0 // 내향형 선택 시 값 설정
-            binding.activityLow.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
-            binding.activityHigh.setBackgroundResource(R.drawable.option_bar_left) // 외향형 버튼의 배경 초기화
+        binding.mI.setOnClickListener {
+            mValue = 0 // 내향형 선택 시 값 설정
+            binding.mI.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
+            binding.mE.setBackgroundResource(R.drawable.option_bar_left) // 외향형 버튼의 배경 초기화
         }
 
         // 감각형(S) / 직관형(N) 버튼
-        binding.thinkHigh.setOnClickListener {
-            thinkValue = 1 // 감각형 선택 시 값 설정
-            binding.thinkHigh.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
-            binding.thinkLow.setBackgroundResource(R.drawable.option_bar_right) // 직관형 버튼의 배경 초기화
+        binding.bS.setOnClickListener {
+            bValue = 1 // 감각형 선택 시 값 설정
+            binding.bS.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
+            binding.bN.setBackgroundResource(R.drawable.option_bar_right) // 직관형 버튼의 배경 초기화
         }
-        binding.thinkLow.setOnClickListener {
-            thinkValue = 0 // 직관형 선택 시 값 설정
-            binding.thinkLow.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
-            binding.thinkHigh.setBackgroundResource(R.drawable.option_bar_left) // 감각형 버튼의 배경 초기화
+        binding.bN.setOnClickListener {
+            bValue = 0 // 직관형 선택 시 값 설정
+            binding.bN.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
+            binding.bS.setBackgroundResource(R.drawable.option_bar_left) // 감각형 버튼의 배경 초기화
         }
 
         // 감정형(F) / 사고형(T) 버튼
-        binding.emotionHigh.setOnClickListener {
-            emotionValue = 1 // 감정형 선택 시 값 설정
-            binding.emotionHigh.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
-            binding.emotionLow.setBackgroundResource(R.drawable.option_bar_right) // 사고형 버튼의 배경 초기화
+        binding.tT.setOnClickListener {
+            tValue = 1 // 감정형 선택 시 값 설정
+            binding.tT.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
+            binding.tF.setBackgroundResource(R.drawable.option_bar_right) // 사고형 버튼의 배경 초기화
         }
-        binding.emotionLow.setOnClickListener {
-            emotionValue = 0 // 사고형 선택 시 값 설정
-            binding.emotionLow.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
-            binding.emotionHigh.setBackgroundResource(R.drawable.option_bar_left) // 감정형 버튼의 배경 초기화
+        binding.tF.setOnClickListener {
+            tValue = 0 // 사고형 선택 시 값 설정
+            binding.tF.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
+            binding.tT.setBackgroundResource(R.drawable.option_bar_left) // 감정형 버튼의 배경 초기화
         }
 
         // 판단형(J) / 인식형(P) 버튼
-        binding.patternHigh.setOnClickListener {
-            patternValue = 1 // 판단형 선택 시 값 설정
-            binding.patternHigh.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
-            binding.patternLow.setBackgroundResource(R.drawable.option_bar_right) // 인식형 버튼의 배경 초기화
+        binding.iJ.setOnClickListener {
+            iValue = 1 // 판단형 선택 시 값 설정
+            binding.iJ.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
+            binding.iP.setBackgroundResource(R.drawable.option_bar_right) // 인식형 버튼의 배경 초기화
         }
-        binding.patternLow.setOnClickListener {
-            patternValue = 0 // 인식형 선택 시 값 설정
-            binding.patternLow.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
-            binding.patternHigh.setBackgroundResource(R.drawable.option_bar_left) // 판단형 버튼의 배경 초기화
+        binding.iP.setOnClickListener {
+            iValue = 0 // 인식형 선택 시 값 설정
+            binding.iP.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
+            binding.iJ.setBackgroundResource(R.drawable.option_bar_left) // 판단형 버튼의 배경 초기화
         }
 
 
@@ -77,10 +76,10 @@ class ProfileOption1Activity : AppCompatActivity() {
         binding.btnNext.setOnClickListener {
             if (isValuesSelected()) {
                 val intent = Intent(this, ProfileOption2Activity::class.java)
-                intent.putExtra("activity", activityValue)
-                intent.putExtra("think", thinkValue)
-                intent.putExtra("emotion", emotionValue)
-                intent.putExtra("pattern", patternValue)
+                intent.putExtra("m", mValue)
+                intent.putExtra("b", bValue)
+                intent.putExtra("t", tValue)
+                intent.putExtra("i", iValue)
                 startActivity(intent)
                 finish()
             } else {
@@ -89,9 +88,9 @@ class ProfileOption1Activity : AppCompatActivity() {
             }
         }
 
-        // 이전으로 버튼 클릭 시 ProfileGenderActivity 로 이동
+        // 이전으로 버튼 클릭 시 MainActivity 로 이동
         binding.btnPrev.setOnClickListener {
-            val intent = Intent(this, ProfileGenderActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -106,6 +105,6 @@ class ProfileOption1Activity : AppCompatActivity() {
 
     // 선택된 값이 모두 있는지 확인하는 함수
     private fun isValuesSelected(): Boolean {
-        return activityValue != 0 && thinkValue != 0 && emotionValue != 0 && patternValue != 0
+        return mValue != -1 && bValue != -1 && tValue != -1 && iValue != -1
     }
 }

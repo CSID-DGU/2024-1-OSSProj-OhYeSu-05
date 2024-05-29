@@ -6,39 +6,34 @@ import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
-import com.example.mytestapp.R
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mytestapp.MainActivity
-import com.example.mytestapp.databinding.ActivityMatchingOption3Binding
+import com.example.mytestapp.R
 
 class MatchingOption3Activity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMatchingOption3Binding // 바인딩 객체 선언
-
-    private lateinit var cleaningSensitivityRadioGroup: RadioGroup
-    private lateinit var noiseSensitivityRadioGroup: RadioGroup
-    private lateinit var firstSleepTimeRadioGroup: RadioGroup
-    private lateinit var secondSleepTimeRadioGroup: RadioGroup
-    private lateinit var drinkingFrequencyRadioGroup: RadioGroup
-
-    private var drinkingFrequency: Int = -1
+    private lateinit var YdrinkingFrequencyRadioGroup: RadioGroup
+    private lateinit var YcleanlinessRadioGroup: RadioGroup
+    private lateinit var YnoiseSensitivityRadioGroup: RadioGroup
+    private lateinit var firstYSleepScheduleRadioGroup: RadioGroup
+    private lateinit var secondYSleepScheduleRadioGroup: RadioGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMatchingOption3Binding.inflate(layoutInflater) // 바인딩 객체 초기화
-        setContentView(binding.root)
+        setContentView(R.layout.activity_matching_option_3)
 
         // 라디오 그룹 초기화
-        cleaningSensitivityRadioGroup = findViewById(R.id.cleaning_sensitivity_radio_group)
-        noiseSensitivityRadioGroup = findViewById(R.id.noise_sensitivity_radio_group)
-        firstSleepTimeRadioGroup = findViewById(R.id.first_sleeptime_radio_group)
-        secondSleepTimeRadioGroup = findViewById(R.id.second_sleep_time_radio_group)
-        drinkingFrequencyRadioGroup = binding.drinkingFrequencyRadioGroup
+        YdrinkingFrequencyRadioGroup = findViewById(R.id.Y_drinking_frequency_radio_group)
+        YcleanlinessRadioGroup = findViewById(R.id.Y_cleanliness_radio_group)
+        YnoiseSensitivityRadioGroup = findViewById(R.id.Y_noise_sensitivity_radio_group)
+        firstYSleepScheduleRadioGroup = findViewById(R.id.first_Y_sleep_schedule_radio_group)
+        secondYSleepScheduleRadioGroup = findViewById(R.id.second_Y_sleep_schedule_radio_group)
+
 
         // 버튼 초기화
-        val btnBack: Button = binding.btnBack
-        val btnNext: Button = binding.btnNext
-        val btnPrev: Button = binding.btnPrev
+        val btnBack: Button = findViewById(R.id.btn_back)
+        val btnNext: Button = findViewById(R.id.btn_next)
+        val btnPrev: Button = findViewById(R.id.btn_prev)
 
         // 버튼 클릭 리스너 설정
         btnBack.setOnClickListener {
@@ -49,7 +44,7 @@ class MatchingOption3Activity : AppCompatActivity() {
         }
 
         btnPrev.setOnClickListener {
-            // 이전 화면으로 이동 (ProfileOption3Activity)
+            // 이전 화면으로 이동 (MatchingOption2Activity)
             val intent = Intent(this, MatchingOption2Activity::class.java)
             startActivity(intent)
             finish()
@@ -57,15 +52,15 @@ class MatchingOption3Activity : AppCompatActivity() {
 
         btnNext.setOnClickListener {
             // 다음 버튼 클릭 시 선택한 값을 확인하고 처리
-            val cleaningSensitivity = getSelectedRadioButtonValue(cleaningSensitivityRadioGroup)
-            val noiseSensitivity = getSelectedRadioButtonValue(noiseSensitivityRadioGroup)
-            val sleepTime = getSelectedRadioButtonValue(firstSleepTimeRadioGroup, secondSleepTimeRadioGroup)
-            val drinkingFrequency = getSelectedRadioButtonValue(drinkingFrequencyRadioGroup)
+            val cleanliness = getSelectedCleanliness()
+            val noiseSensitivity = getSelectedNoiseSensitivity()
+            val sleepSchedule = getSelectedSleepSchedule()
+            val drinkingFrequency = getSelectedDrinkingFrequency()
 
-            if (cleaningSensitivity == "선택되지 않음" ||
-                noiseSensitivity == "선택되지 않음" ||
-                sleepTime == "선택되지 않음" ||
-                drinkingFrequency == "선택되지 않음") {
+            if (cleanliness == -1 ||
+                noiseSensitivity == -1 ||
+                sleepSchedule == -1 ||
+                drinkingFrequency == -1) {
                 // 필수 정보를 선택하지 않았을 경우에 대한 처리
                 Toast.makeText(this, "모든 선택지를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
@@ -78,22 +73,60 @@ class MatchingOption3Activity : AppCompatActivity() {
         }
     }
 
-    // 라디오 그룹에서 선택된 값 가져오기
-    private fun getSelectedRadioButtonValue(radioGroup: RadioGroup): String {
-        val selectedId = radioGroup.checkedRadioButtonId
-        if (selectedId != -1) {
-            val selectedRadioButton: RadioButton = findViewById(selectedId)
-            return selectedRadioButton.text.toString()
+    // 음주 빈도에 대한 선택된 값을 반환하는 함수
+    private fun getSelectedDrinkingFrequency(): Int {
+        return when (YdrinkingFrequencyRadioGroup.checkedRadioButtonId) {
+            R.id.Y_frequency_zero -> 0
+            R.id.Y_frequency_third -> 1
+            R.id.Y_frequency_fifth -> 2
+            else -> -1 // 선택된 값이 없는 경우 -1을 반환
         }
-        return "선택되지 않음"
     }
 
-    // 두 개의 라디오 그룹에서 선택된 값 가져오기 (첫 번째 그룹이 우선)
-    private fun getSelectedRadioButtonValue(firstGroup: RadioGroup, secondGroup: RadioGroup): String {
-        val firstGroupValue = getSelectedRadioButtonValue(firstGroup)
-        if (firstGroupValue != "선택되지 않음") {
-            return firstGroupValue
+    // 청결에 대한 선택된 값을 반환하는 함수
+    private fun getSelectedCleanliness(): Int {
+        return when (YcleanlinessRadioGroup.checkedRadioButtonId) {
+            R.id.Y_cleanliness_sensitive -> 0
+            R.id.Y_cleanliness_normal -> 1
+            R.id.Y_cleanliness_not_sensitive -> 2
+            else -> -1 // 선택된 값이 없는 경우 -1을 반환
         }
-        return getSelectedRadioButtonValue(secondGroup)
     }
+
+    // 소음 민감도에 대한 선택된 값을 반환하는 함수
+    private fun getSelectedNoiseSensitivity(): Int {
+        return when (YnoiseSensitivityRadioGroup.checkedRadioButtonId) {
+            R.id.Y_noise_sensitivity_sensitive -> 0
+            R.id.Y_noise_sensitivity_normal -> 1
+            R.id.Y_noise_sensitivity_not_sensitive -> 2
+            else -> -1 // 선택된 값이 없는 경우 -1을 반환
+        }
+    }
+
+    // 취침 시간에 대한 선택된 값을 반환하는 함수
+    private fun getSelectedSleepSchedule(): Int {
+        val firstGroupCheckedId = firstYSleepScheduleRadioGroup.checkedRadioButtonId
+        val secondGroupCheckedId = secondYSleepScheduleRadioGroup.checkedRadioButtonId
+
+        return when {
+            firstGroupCheckedId != -1 -> { // 첫 번째 라디오 그룹에서 선택된 경우
+                when (firstGroupCheckedId) {
+                    R.id.Y_sleep_early -> 0
+                    R.id.Y_sleep_ten -> 1
+                    R.id.Y_sleep_normal -> 2
+                    else -> -1 // 선택된 값이 없는 경우 -1을 반환
+                }
+            }
+            secondGroupCheckedId != -1 -> { // 두 번째 라디오 그룹에서 선택된 경우
+                when (secondGroupCheckedId) {
+                    R.id.Y_sleep_late -> 3
+                    R.id.Y_sleep_very_late -> 4
+                    else -> -1 // 선택된 값이 없는 경우 -1을 반환
+                }
+            }
+            else -> -1 // 선택된 값이 없는 경우 -1을 반환
+        }
+    }
+
+
 }

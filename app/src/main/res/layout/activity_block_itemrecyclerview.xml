@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!--이름 넣을 예정-->
+    <TextView
+        android:id="@+id/BlockedIDTextView"
+        android:background="@drawable/stroke_bottom_gray"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="18sp"
+        android:padding="25dp"/>
+
+    <Button
+        android:id="@+id/unblockButton"
+        android:backgroundTint="@color/orange_main"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:textColor="@color/text_white"
+        android:fontFamily="@font/pretendard_bold"
+        android:textSize="18sp"
+        android:text="차단해제"/>
+</LinearLayout>

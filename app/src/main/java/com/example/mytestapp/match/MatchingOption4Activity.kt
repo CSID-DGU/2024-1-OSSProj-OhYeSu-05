@@ -12,16 +12,16 @@ import com.example.mytestapp.R
 
 class MatchingOption4Activity : AppCompatActivity() {
 
-    private lateinit var firstUptimeRadioGroup: RadioGroup
-    private lateinit var secondUptimeRadioGroup: RadioGroup
+    private lateinit var firstYUpscheduleRadioGroup: RadioGroup
+    private lateinit var secondYUpscheduleRadioGroup: RadioGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_option_4)
 
         // 라디오 그룹 초기화
-        firstUptimeRadioGroup = findViewById(R.id.first_uptime_radio_group)
-        secondUptimeRadioGroup = findViewById(R.id.second_uptime_radio_group)
+        firstYUpscheduleRadioGroup = findViewById(R.id.first_Y_up_schedule_radio_group)
+        secondYUpscheduleRadioGroup = findViewById(R.id.second_Y_up_schedule_radio_group)
 
         // 버튼 초기화
         val btnBack: Button = findViewById(R.id.btn_back)
@@ -44,15 +44,17 @@ class MatchingOption4Activity : AppCompatActivity() {
         }
 
         btnFinish.setOnClickListener {
-            // 프로필 완성 버튼 클릭 시, 선택된 값을 가져와서 처리
-            val uptime = getSelectedRadioButtonValue(firstUptimeRadioGroup, secondUptimeRadioGroup)
+            // 매칭 조건 입력 완성 버튼 클릭 시, 선택된 값을 가져와서 처리
+            val upSchedule = getSelectedUpSchedule()
 
-            if (uptime == "선택되지 않음") {
+            if (upSchedule == -1) {
                 // 필수 정보를 선택하지 않았을 경우에 대한 처리
                 Toast.makeText(this, "모든 선택지를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
+                // 매칭을 시작합니다 라는 메시지를 표시
+                Toast.makeText(this, "매칭을 시작합니다.", Toast.LENGTH_SHORT).show()
                 // 선택한 값들을 다음 액티비티로 전달하고 해당 액티비티로 이동
-                val intent = Intent(this, MatchingOptionTotalActivity::class.java)
+                val intent = Intent(this, MatchingING::class.java)   // 추천 목록 구현 필요
                 // 여기에 선택한 값들을 intent에 추가하는 코드 추가해야 함
                 startActivity(intent)
                 finish()
@@ -60,22 +62,27 @@ class MatchingOption4Activity : AppCompatActivity() {
         }
     }
 
-    // 라디오 그룹에서 선택된 값 가져오기
-    private fun getSelectedRadioButtonValue(radioGroup: RadioGroup): String {
-        val selectedId = radioGroup.checkedRadioButtonId
-        if (selectedId != -1) {
-            val selectedRadioButton: RadioButton = findViewById(selectedId)
-            return selectedRadioButton.text.toString()
-        }
-        return "선택되지 않음"
-    }
+    private fun getSelectedUpSchedule(): Int {
+        val firstGroupCheckedId = firstYUpscheduleRadioGroup.checkedRadioButtonId
+        val secondGroupCheckedId = secondYUpscheduleRadioGroup.checkedRadioButtonId
 
-    // 두 개의 라디오 그룹에서 선택된 값 가져오기 (첫 번째 그룹이 우선)
-    private fun getSelectedRadioButtonValue(firstGroup: RadioGroup, secondGroup: RadioGroup): String {
-        val firstGroupValue = getSelectedRadioButtonValue(firstGroup)
-        if (firstGroupValue != "선택되지 않음") {
-            return firstGroupValue
+        return when {
+            firstGroupCheckedId != -1 -> { // 첫 번째 라디오 그룹에서 선택된 경우
+                when (firstGroupCheckedId) {
+                    R.id.Y_up_early -> 0
+                    R.id.Y_up_seven -> 1
+                    R.id.Y_up_normal -> 2
+                    else -> -1 // 선택된 값이 없는 경우 -1을 반환
+                }
+            }
+            secondGroupCheckedId != -1 -> { // 두 번째 라디오 그룹에서 선택된 경우
+                when (secondGroupCheckedId) {
+                    R.id.Y_up_late -> 3
+                    R.id.Y_up_very_late -> 4
+                    else -> -1 // 선택된 값이 없는 경우 -1을 반환
+                }
+            }
+            else -> -1 // 선택된 값이 없는 경우 -1을 반환
         }
-        return getSelectedRadioButtonValue(secondGroup)
     }
 }

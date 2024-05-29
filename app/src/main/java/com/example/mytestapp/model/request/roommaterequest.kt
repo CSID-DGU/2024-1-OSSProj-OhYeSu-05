@@ -6,34 +6,40 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class roommaterequest(
+
     //option1 - mbti
-    @SerialName("activity")
-    val activity: String,
-    @SerialName("smoking")
-    val smoking: String,
-    @SerialName("firstclass")
-    val firstclass: String,
-    @SerialName("sleepinghabit")
-    val sleepinghabit: String,
+    @SerialName("Y_m")
+    val Y_m: Int,
+    @SerialName("Y_grade")    // 얘는 이진 아님 (학년)
+    val Y_grade: Int,
+    @SerialName("Y_smoking")
+    val Y_smoking: Int,
+    @SerialName("Y_first_lesson")
+    val Y_first_lesson: Int,
+    @SerialName("Y_sleeping_habit")
+    val Y_sleeping_habit: Int,
+
     // option2
-    @SerialName("sharing")
-    val sharing: String,
-    @SerialName("calling")
-    val calling: String,
-    @SerialName("hottemp")
-    val hottemp: String,
-    @SerialName("coldtemp")
+    @SerialName("Y_sharing_daily_needs")
+    val Y_sharing_daily_needs: Int,
+    @SerialName("Y_internal_communication")
+    val Y_internal_communication: Int,
+    @SerialName("Y_heat_sensitive")
+    val Y_heat_sensitive: Int,
+    @SerialName("Y_cold_sensitive")
+    val Y_cold_sensitive: Int,
+
     //option3
-    val coldtemp: String,
-    @SerialName("drinking")
-    val drinking: String,
-    @SerialName("cleaning")
-    val cleaning: String,
-    @SerialName("noise")
-    val noise: String,
-    @SerialName("sleeptime")
-    val sleeptime: String,
+    @SerialName("Y_drinking_frequency")
+    val Y_drinking_frequency: Int,
+    @SerialName("Y_cleanliness")
+    val Y_cleanliness: Int,
+    @SerialName("Y_noise_sensitivity")
+    val Y_noise_sensitivity: Int,
+    @SerialName("Y_sleep_schedule")
+    val Y_sleep_schedule: Int,
+
     //option4
-    @SerialName("uptime")
-    val uptime: String
+    @SerialName("Y_up_schedule")
+    val Y_up_schedule: Int
 )

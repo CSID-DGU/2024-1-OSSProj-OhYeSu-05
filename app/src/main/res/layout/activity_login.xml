@@ -42,7 +42,7 @@
 
                 <!--ID 코틀린하고 맞춤-->
                 <EditText
-                    android:id="@+id/loginID"
+                    android:id="@+id/UserID"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="#00ff0000"

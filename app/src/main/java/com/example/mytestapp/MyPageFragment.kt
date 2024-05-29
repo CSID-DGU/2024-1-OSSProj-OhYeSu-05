@@ -6,8 +6,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.mytestapp.BlockListActivity
 import com.example.mytestapp.R
-import com.example.mytestapp.profile.ProfileGenderActivity
+import com.example.mytestapp.profile.ProfileOption1Activity
 
 class MyPageFragment : Fragment() {
 
@@ -23,7 +24,7 @@ class MyPageFragment : Fragment() {
         val studentId = arguments?.getString("studentId")
 
         // 학번과 이름을 표시할 TextView 찾기
-        val studentIdTextView = view.findViewById<TextView>(R.id.student_id)
+        val studentIdTextView = view.findViewById<TextView>(R.id.StudentID)
         val nameTextView = view.findViewById<TextView>(R.id.Name)
 
         // 학번과 이름 설정
@@ -34,7 +35,7 @@ class MyPageFragment : Fragment() {
         view.findViewById<Button>(R.id.editProfileButton).setOnClickListener {
             // TODO: 프로필 수정 버튼 클릭 시 동작 구현
             // ProfileOption1Activity로 이동
-            val intent = Intent(requireContext(), ProfileGenderActivity::class.java)
+            val intent = Intent(requireContext(), ProfileOption1Activity::class.java)
             startActivity(intent)
         }
 
@@ -42,7 +43,8 @@ class MyPageFragment : Fragment() {
         view.findViewById<Button>(R.id.blockListButton).setOnClickListener {
             // TODO: 차단 목록 관리 버튼 클릭 시 동작 구현
             // 차단 목록 액티비티를 열거나 프래그먼트 내에서 차단 목록을 관리하는 기능
-
+            val intent = Intent(requireContext(), BlockListActivity::class.java)
+            startActivity(intent)
         }
 
         // 로그아웃 버튼 클릭 시

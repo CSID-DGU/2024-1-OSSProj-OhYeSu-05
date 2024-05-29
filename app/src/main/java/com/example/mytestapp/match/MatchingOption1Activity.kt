@@ -11,10 +11,11 @@ import com.example.mytestapp.databinding.ActivityMatchingOption1Binding
 
 class MatchingOption1Activity : AppCompatActivity() {
     private lateinit var binding: ActivityMatchingOption1Binding
-    private var activityValue = 0
-    private var smokingValue: Int = -1
-    private var firstClassValue: Int = -1
-    private var sleepingHabitValue: Int = -1
+    private var Y_mValue: Int = -1
+    private var Y_gradeValue: Int = -1
+    private var Y_smokingValue: Int = -1
+    private var Y_firstLessonValue: Int = -1
+    private var Y_sleepingHabitValue: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +40,11 @@ class MatchingOption1Activity : AppCompatActivity() {
             if (isValuesSelected()) {
                 // 선택한 값들을 다음 액티비티로 전달하고 해당 액티비티로 이동
                 val intent = Intent(this, MatchingOption2Activity::class.java)
-                intent.putExtra("activity", activityValue)
-                intent.putExtra("smoking", smokingValue)
-                intent.putExtra("firstClass", firstClassValue)
-                intent.putExtra("sleepingHabit", sleepingHabitValue)
+                intent.putExtra("Ym", Y_mValue)
+                intent.putExtra("Ygrade", Y_gradeValue)
+                intent.putExtra("Ysmoking", Y_smokingValue)
+                intent.putExtra("YfirstLesson", Y_firstLessonValue)
+                intent.putExtra("YsleepingHabit", Y_sleepingHabitValue)
                 startActivity(intent)
                 finish()
             } else {
@@ -51,35 +53,47 @@ class MatchingOption1Activity : AppCompatActivity() {
             }
         }
 
-        // 외향형 / 내향형 버튼 클릭 리스너
-        binding.activityHigh.setOnClickListener {
-            activityValue = 1
-            binding.activityHigh.setBackgroundResource(R.drawable.option_bar_left_selected)
-            binding.activityLow.setBackgroundResource(R.drawable.option_selector_right)
+        // 외향형(E) / 내향형(I) 버튼
+        binding.YME.setOnClickListener {
+            Y_mValue = 1 // 외향형 선택 시 값 설정
+            binding.YME.setBackgroundResource(R.drawable.option_bar_left_selected) // 선택된 상태 배경으로 변경
+            binding.YMI.setBackgroundResource(R.drawable.option_bar_right) // 내향형 버튼의 배경 초기화
+        }
+        binding.YMI.setOnClickListener {
+            Y_mValue = 0 // 내향형 선택 시 값 설정
+            binding.YMI.setBackgroundResource(R.drawable.option_bar_right_selected) // 선택된 상태 배경으로 변경
+            binding.YME.setBackgroundResource(R.drawable.option_bar_left) // 외향형 버튼의 배경 초기화
         }
 
-        binding.activityLow.setOnClickListener {
-            activityValue = 0
-            binding.activityLow.setBackgroundResource(R.drawable.option_bar_right_selected)
-            binding.activityHigh.setBackgroundResource(R.drawable.option_selector_left)
+        // 학년 선택 라디오 그룹에서 선택한 값을 변수에 저장
+        binding.YGradeRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            Y_gradeValue = when (checkedId) {
+                R.id.Y_grade_1 -> 1
+                R.id.Y_grade_2 -> 2
+                R.id.Y_grade_3 -> 3
+                R.id.Y_grade_4 -> 4
+                else -> -1 // 선택하지 않았을 경우 -1로 설정
+            }
         }
 
-        // 각 라디오 버튼 그룹에 대한 리스너 설정 및 선택된 값 저장
-        binding.smokingRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            smokingValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        // 흡연 여부 라디오 그룹에서 선택한 값을 변수에 저장
+        binding.YSmokingRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            Y_smokingValue = if (checkedId == R.id.Y_smoking_yes) 1 else 0 // O는 1, X는 0으로 저장
         }
 
-        binding.firstclassRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            firstClassValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        // 1교시 유무 라디오 그룹에서 선택한 값을 변수에 저장
+        binding.YFirstLessonRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            Y_firstLessonValue = if (checkedId == R.id.Y_first_lesson_yes) 1 else 0 // O는 1, X는 0으로 저장
         }
 
-        binding.sleepinghabitRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            sleepingHabitValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        // 잠버릇 유무 라디오 그룹에서 선택한 값을 변수에 저장
+        binding.YSleepingHabitRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            Y_sleepingHabitValue = if (checkedId == R.id.Y_sleeping_habit_yes) 1 else 0 // O는 1, X는 0으로 저장
         }
     }
 
     private fun isValuesSelected(): Boolean {
         // 모든 값이 선택되었는지 확인하는 함수
-        return (activityValue != 0 && smokingValue != -1 && firstClassValue != -1 && sleepingHabitValue != -1)
+        return (Y_gradeValue != -1 && Y_mValue != -1 && Y_smokingValue != -1 && Y_firstLessonValue != -1 && Y_sleepingHabitValue != -1)
     }
 }

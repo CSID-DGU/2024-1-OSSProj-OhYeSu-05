@@ -100,7 +100,7 @@
 
         <!-- 첫 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/first_uptime_radio_group"
+            android:id="@+id/first_Y_up_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -109,7 +109,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/uptime_early"
+                android:id="@+id/Y_up_early"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="7시 이전"
@@ -117,7 +117,7 @@
                 android:layout_marginEnd="30dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_seven"
+                android:id="@+id/Y_up_seven"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="7 ~ 8"
@@ -125,7 +125,7 @@
                 android:layout_marginEnd="30dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_normal"
+                android:id="@+id/Y_up_normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="8 ~ 9"
@@ -136,7 +136,7 @@
 
         <!-- 두 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/second_uptime_radio_group"
+            android:id="@+id/second_Y_up_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -145,7 +145,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/uptime_late"
+                android:id="@+id/Y_up_late"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="9 ~ 10"
@@ -153,7 +153,7 @@
                 android:layout_marginEnd="23dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_verylate"
+                android:id="@+id/Y_up_very_late"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10시 이후"

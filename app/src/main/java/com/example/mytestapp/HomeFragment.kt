@@ -7,11 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import com.example.mytestapp.R
 //import com.example.mytestapp.create_room.CreateRoomLocalActivity
 import com.example.mytestapp.databinding.FragmentHomeBinding
 import com.example.mytestapp.match.MatchingOption1Activity
-import com.example.mytestapp.profile.ProfileGenderActivity
+import com.example.mytestapp.profile.ProfileOption1Activity
 
 class HomeFragment: Fragment(), View.OnClickListener  {
     private var _binding: FragmentHomeBinding? = null
@@ -32,7 +31,7 @@ class HomeFragment: Fragment(), View.OnClickListener  {
 
         binding.btnProfile.setOnClickListener {
             activity?.let{
-                val intent1 = Intent (it, ProfileGenderActivity::class.java)
+                val intent1 = Intent (it, ProfileOption1Activity::class.java)
                 it.startActivity(intent1)
             }
         }
@@ -60,7 +59,7 @@ class HomeFragment: Fragment(), View.OnClickListener  {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.btn_profile -> {
-                val intent = Intent(getActivity(), ProfileGenderActivity::class.java)
+                val intent = Intent(getActivity(), ProfileOption1Activity::class.java)
                 startActivity(intent)
             }
             R.id.btn_matching -> {

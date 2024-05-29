@@ -98,7 +98,7 @@
             android:layout_marginTop="10dp" />
 
         <RadioGroup
-            android:id="@+id/cleaning_sensitivity_radio_group"
+            android:id="@+id/cleanliness_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -115,7 +115,7 @@
 <!--                android:layout_marginEnd="20dp"/>-->
 
             <RadioButton
-                android:id="@+id/cleaning_sensitive"
+                android:id="@+id/cleanliness_sensitive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="다소 민감"
@@ -123,7 +123,7 @@
                 android:layout_marginEnd="30dp"/>
 
             <RadioButton
-                android:id="@+id/cleaning_normal"
+                android:id="@+id/cleanliness_normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
@@ -131,7 +131,7 @@
                 android:text="보통" />
 
             <RadioButton
-                android:id="@+id/cleaning_not_sensitive"
+                android:id="@+id/cleanliness_not_sensitive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/orange_main"
@@ -208,7 +208,7 @@
 
         <!-- 첫 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/first_sleeptime_radio_group"
+            android:id="@+id/first_sleep_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -244,7 +244,7 @@
 
         <!-- 두 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/second_sleep_time_radio_group"
+            android:id="@+id/second_sleep_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -261,7 +261,7 @@
                 android:layout_marginEnd="23.5dp"/>
 
             <RadioButton
-                android:id="@+id/sleep_verylate"
+                android:id="@+id/sleep_very_late"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1시 이후"
@@ -286,7 +286,7 @@
 
         <!-- 첫 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/first_uptime_radio_group"
+            android:id="@+id/first_up_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -295,7 +295,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/uptime_early"
+                android:id="@+id/up_early"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="7시 이전"
@@ -303,7 +303,7 @@
                 android:layout_marginEnd="30dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_seven"
+                android:id="@+id/up_seven"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="7 ~ 8"
@@ -311,7 +311,7 @@
                 android:layout_marginEnd="30dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_normal"
+                android:id="@+id/up_normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="8 ~ 9"
@@ -322,7 +322,7 @@
 
         <!-- 두 번째 라인의 라디오 버튼 -->
         <RadioGroup
-            android:id="@+id/second_uptime_radio_group"
+            android:id="@+id/second_up_schedule_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -331,7 +331,7 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/uptime_late"
+                android:id="@+id/up_late"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="9 ~ 10"
@@ -339,7 +339,7 @@
                 android:layout_marginEnd="23dp"/>
 
             <RadioButton
-                android:id="@+id/uptime_verylate"
+                android:id="@+id/up_very_late"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10시 이후"

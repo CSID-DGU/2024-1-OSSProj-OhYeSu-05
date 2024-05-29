@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.Toast
+import com.example.mytestapp.R
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mytestapp.MainActivity
 import com.example.mytestapp.databinding.ActivityProfileOption3Binding
@@ -11,9 +12,9 @@ import com.example.mytestapp.databinding.ActivityProfileOption3Binding
 class ProfileOption3Activity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileOption3Binding
     // 변수 설정
-    private var callingValue: Int = -1
-    private var hotTempValue: Int = -1
-    private var coldTempValue: Int = -1
+    private var internalCommunicationValue: Int = -1
+    private var heatSensitiveValue: Int = -1
+    private var coldSensitiveValue: Int = -1
     private var drinkingFrequencyValue: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +40,9 @@ class ProfileOption3Activity : AppCompatActivity() {
             if (isValuesSelected()) {
                 // 선택한 값들을 다음 액티비티로 전달하고 해당 액티비티로 이동
                 val intent = Intent(this, ProfileOption4Activity::class.java)
-                intent.putExtra("calling", callingValue)
-                intent.putExtra("hotTemp", hotTempValue)
-                intent.putExtra("coldTemp", coldTempValue)
+                intent.putExtra("internalCommunication", internalCommunicationValue)
+                intent.putExtra("heatSensitive", heatSensitiveValue)
+                intent.putExtra("coldSensitive", coldSensitiveValue)
                 intent.putExtra("drinkingFrequency", drinkingFrequencyValue)
                 startActivity(intent)
                 finish()
@@ -52,25 +53,29 @@ class ProfileOption3Activity : AppCompatActivity() {
         }
 
         // 각 라디오 버튼 그룹에 대한 리스너 설정 및 선택된 값 저장
-        binding.callingRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            callingValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        binding.internalCommunicationRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            internalCommunicationValue = if (checkedId == R.id.internal_communication_yes) 1 else 0
         }
 
-        binding.hottempRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            hotTempValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        binding.heatSensitiveRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            heatSensitiveValue = if (checkedId == R.id.heat_sensitive_yes) 1 else 0
         }
 
-        binding.coldtempRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            coldTempValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+        binding.coldSensitiveRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            coldSensitiveValue = if (checkedId == R.id.cold_sensitive_yes) 1 else 0
         }
 
         binding.drinkingFrequencyRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            drinkingFrequencyValue = findViewById<RadioButton>(checkedId).text.toString().toInt()
+            drinkingFrequencyValue = when (checkedId) {
+                R.id.frequency_zero -> 0
+                R.id.frequency_third -> 1
+                else -> 2
+            }
         }
     }
 
     private fun isValuesSelected(): Boolean {
         // 모든 값이 선택되었는지 확인을 위한 함수
-        return (callingValue != -1 && hotTempValue != -1 && coldTempValue != -1 && drinkingFrequencyValue != -1)
+        return (internalCommunicationValue != -1 && heatSensitiveValue != -1 && coldSensitiveValue != -1 && drinkingFrequencyValue != -1)
     }
 }

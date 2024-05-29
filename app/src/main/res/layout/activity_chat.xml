@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/realwhite"
-    tools:context=".Chat.ChatActivity">
+    tools:context=".chat.ChatActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,38 +31,42 @@
 
             <TextView
                 android:id="@+id/textTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="@font/pretendard"
                 android:gravity="center"
-                android:text="chatRoomTitle"
+                android:text=""
                 android:textColor="@color/text_main"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageView
                 android:id="@+id/imageMenu"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/menu"
-                app:tint="@color/realblack" />
+                app:tint="@color/realblack"
+                android:contentDescription="@string/menu_icon_description"
+                android:clickable="true"
+                android:focusable="true" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_recyclerView"
-            android:layout_width="410dp"
-            android:layout_height="600dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginTop="9dp"
-            android:layout_weight="1"
             android:paddingHorizontal="30dp"
             android:paddingLeft="35dp"
             android:paddingRight="35dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/chat_inputBox"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-            app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="MissingConstraints" />
 
         <LinearLayout
@@ -90,21 +95,20 @@
                     android:ems="10"
                     android:inputType="textMultiLine"
                     android:minHeight="48dp"
-                    android:scrollHorizontally="false" />
+                    android:scrollHorizontally="false"
+                    android:autofillHints="autofillHints"
+                    android:hint="@string/chat_input_hint" />
 
-                <de.hdodenhof.circleimageview.CircleImageView
+                <Button
                     android:id="@+id/message_send"
                     android:layout_width="45dp"
                     android:layout_height="45dp"
                     android:layout_gravity="center_vertical"
-                    android:padding="3dp"
-                    android:src="@drawable/ic_send"
-                    tools:ignore="MissingClass"
+                    android:background="@drawable/ic_send"
+                    android:contentDescription="@string/send_button_description"
                     android:clickable="true"
                     android:focusable="true" />
-
             </androidx.appcompat.widget.LinearLayoutCompat>
-
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -113,5 +117,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/realwhite" />
+        android:background="@color/realwhite"
+        app:menu="@menu/chat_menu" />
 </androidx.drawerlayout.widget.DrawerLayout>

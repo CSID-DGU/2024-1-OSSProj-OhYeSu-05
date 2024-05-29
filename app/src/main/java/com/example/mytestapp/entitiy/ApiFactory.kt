@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 object ApiFactory {
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("http://ec2-13-124-159-83.ap-northeast-2.compute.amazonaws.com:8000/")
+            .baseUrl("https://638c-58-140-213-197.ngrok-free.app/")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
 
@@ -20,13 +20,19 @@ object ApiFactory {
     inline fun <reified T> create(): T = retrofit.create<T>(T::class.java)
 }
 
-object CriminalServicePool {
+object KiriServicePool {
     val signupService = ApiFactory.create<SignService>()
     val loginService = ApiFactory.create<SignService>()
-    val createroomService = ApiFactory.create<CreateRoomService>()
-    val searchroomService = ApiFactory.create<SearchRoomService>()
-    val roomlistService = ApiFactory.create<RoomlistService>()
-    val enterroomService = ApiFactory.create<EnterRoomlistService>()
+    val ProfileService = ApiFactory.create<ProfileService>()
+    val RoommateService = ApiFactory.create<RoommateService>()
+    val matchingService = ApiFactory.create<MatchingService>()
+    val chatService = ApiFactory.create<ChatService>()
+
+//    val createroomService = ApiFactory.create<CreateRoomService>()
+//    val searchroomService = ApiFactory.create<SearchRoomService>()
+
+//    val roomlistService = ApiFactory.create<RoomlistService>()
+//    val enterroomService = ApiFactory.create<EnterRoomlistService>()
 }
 
 

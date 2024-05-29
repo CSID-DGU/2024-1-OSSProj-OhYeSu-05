@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect
 # Create your views here.
 from rest_framework import viewsets
-from .serializers import UserSerializer, RoomSerializer, ChatSerializer
+from .serializers import UserSerializer, ChatRoomSerializer, ChatSerializer
 # 시리얼라이저 profile, userpref, match, report, block 추가
 from .serializers import ProfileSerializer, UPrefSerializer, MatchSerializer, ReportSerializer, BlockSerializer
-from .models import AppUser, Room, Chat
+from .models import AppUser, ChatRoom, Chat
 # 모델 profile, userpref, match, report, block 추가
 from .models import Profile, UserPref, Match, Report, Block
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http.response import HttpResponse
 from rest_framework.response import Response
+from django.utils import timezone
 from django.contrib import auth
 
 from django.contrib.auth.models import User
@@ -18,9 +19,14 @@ from django.contrib.auth import authenticate,login
 from django.contrib.sessions.models import Session
 import numpy as np,random
 
+from scipy.spatial.distance import euclidean
+from sklearn.metrics import jaccard_score
+from .models import AppUser, Match, Profile, UserPref
+
 
 # from django.contrib.auth import authenticate
-#확인
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = AppUser.objects.all()
     serializer_class = UserSerializer
@@ -31,24 +37,21 @@ class UserViewSet(viewsets.ModelViewSet):
         id = request.data.get('id')
         password = request.data.get('password')
         name = request.data.get('name')
-        # 학번 추가
-        studentid = request.data.get('studentId')
-        #회원가입시 아이디, 비번, 이름 등록
+        # 학번, 성별 추가
+        studentId = request.data.get('studentId')
+        gender = request.data.get('gender')
 
-        # studentid 추가
-        if id and password and name and studentid:
+        # studentid, gender 추가
+        if id and password and name and studentId and gender:
             try:
-                # Check if a user with the provided username already exists
+                # 회원 정보가 존재하는지 체크
                 existing_user = AppUser.objects.get(id = id)
                 return Response({'success': 'False'}, status=status.HTTP_400_BAD_REQUEST)
             except AppUser.DoesNotExist:
-                # Create a new user
+                # 회원 새로 생성
                 user_count = AppUser.objects.count() + 1
-                # studentid 추가
-                user = AppUser.objects.create(userID = user_count,id = id, password=password, name = name, studentId = studentid)
-                room_count = Room.objects.count()
-                roomID = '0' * room_count
-                user.roomID = roomID
+                # studentId, gender 추가
+                user = AppUser.objects.create(userID = user_count,id = id, password=password, name = name, studentId = studentId, gender = gender)
                 user.save()
                 return Response({'success': True}, status=status.HTTP_201_CREATED)
         else:
@@ -92,460 +95,98 @@ class UserViewSet(viewsets.ModelViewSet):
         request.session.flush()
         return Response({'success': True}, status=status.HTTP_200_OK)
 
-#수치로의 변환 함수들
-def convert_genre(장르):
-    if 장르 == '모험':
-        return 0
-    elif 장르 == '코믹':
-        return 1
-    elif 장르 =='판타지':
-        return 2
-    elif 장르 == '로맨스':
-        return 3
-    elif 장르 == '스릴러':
-        return 4
-    elif 장르 == '드라마':
-        return 5
-    elif 장르 == '호러':
-        return 6
-    elif 장르 == '공상과학':
-        return 7
-    elif 장르 == '미스테리':
-        return 8
-    elif 장르 == '액션':
-        return 9
-    else:
-        return -1
 
-def convert_difficulty(난이도):
-    if 난이도 == '상':
-        return 3
-    elif 난이도 == '중':
-        return 2
-    elif 난이도 == '하':
-        return 1
-    else:
-        return 0
 
-def convert_fear(공포도):
-    if 공포도 == '상':
-        return 3
-    elif 공포도 == '중':
-        return 2
-    elif 공포도 == '하':
-        return 1
-    else:
-        return 0
 
-def convert_activity(활동성):
-    if 활동성 == '상':
-        return 3
-    elif 활동성 == '중':
-        return 2
-    elif 활동성 == '하':
-        return 1
-    else:
-        return 0
-
-    #ModelViewSet은 기본적으로 CRUD를 제공함.
-class RoomViewSet(viewsets.ModelViewSet):
-    queryset = Room.objects.all()
-    serializer_class = RoomSerializer
-
-    response_data = []
+# 채팅방 생성
+class ChatRoomListViewSet(viewsets.ModelViewSet):
+    queryset = ChatRoom.objects.all()
+    serializer_class = ChatRoomSerializer
 
     @api_view(['POST'])
-    def roomcreate(request):
+    def chatroomcreate(request):
+        userID = request.data.get('userID')
+        userID2 = request.data.get('userID2')
+        userID2name = AppUser.objects.get(userID = userID2).name
 
-        user_id = request.data.get('user_id')
-        date = request.data.get('date')
-        region = request.data.get('region')
-        title = request.data.get('title')
-        roomIntro = request.data.get('roomIntro')
-        genre = request.data.get('genre')
-        difficulty = request.data.get('difficulty')
-        fear = request.data.get('fear')
-        activity = request.data.get('activity')
+        AccessedTime = request.data.get('AccessedTime')
+        recentMessage = request.data.get('recentMessage')
 
-        if date and region and title and roomIntro and difficulty and fear and activity:
+        if userID and userID2 and userID2name and AccessedTime and recentMessage:
+            room_count = ChatRoom.objects.count() + 1
+            chatroom = ChatRoom.objects.create(HistoryID = room_count, userID = userID,
+                                               userID2 = userID2, userID2name = userID2name,
+                                               AccessedTime = AccessedTime,
+                                               recentMessage = recentMessage)
+            chatroom.save()
+            return Response({'success': True}, status=status.HTTP_201_CREATED)
 
-            room_count = Room.objects.count() + 1
-            room = Room.objects.create(
-                roomID = room_count,
-                date=date,
-                region=region,
-                title=title,
-                roomIntro=roomIntro,
-                genre=convert_genre(genre),
-                difficulty=convert_difficulty(difficulty),
-                fear=convert_fear(fear),
-                activity=convert_activity(activity)
-            )
-
-            #user_id = request.session.get('user_id')
-            print(user_id)
-            if user_id:
-                try:
-                    room_creator = AppUser.objects.get(id=user_id)
-                    room_index = room.roomID              # 방의 인덱스를 가져옴 (0부터 시작)
-                    users = AppUser.objects.all()
-                    for user in users:
-                        roomID = user.roomID            # 사용자의 roomID 가져오기
-                        if user == room_creator:        # 방을 만든 사용자인 경우
-                            roomID = roomID[:room_index] + '1'  # 해당 위치에 1을 추가
-                        else:                           # 방을 만든 사용자가 아닌 경우
-                            roomID = roomID[:room_index] + '0' # 해당 위치에 0을 추가
-                        user.roomID = roomID            # 사용자의 roomID를 업데이트
-                        user.save()
-                    return Response({'success': True}, status=status.HTTP_201_CREATED)
-                except AppUser.DoesNotExist:
-                    return Response({'success1': False}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
-
-    @api_view(['POST'])
-    def roomsearch(request):
-        user_option = {
-            'area1': request.data.get('area1'),
-            'area2': request.data.get('area2'),
-            'area3': request.data.get('area3'),
-            'startdate': request.data.get('startdate'),
-            'enddate': request.data.get('enddate'),
-            'genre': request.data.get('genre'),
-            'difficulty': request.data.get('difficulty'),
-            'fear': request.data.get('fear'),
-            'activity': request.data.get('activity')
-        }
-
-        user_option['startdate'] = int(user_option['startdate'].replace('.', ''))
-        user_option['enddate'] = int(user_option['enddate'].replace('.', ''))
-
-        genre_mapping = {
-            '모험': 0,
-            '코믹': 1,
-            '판타지': 2,
-            '로맨스': 3,
-            '스릴러': 4,
-            '드라마': 5,
-            '호러': 6,
-            '공상과학': 7,
-            '미스테리': 8,
-            '액션': 9
-        }
-
-        user_option['genre'] = genre_mapping.get(user_option['genre'], -1)
-
-        #난이도 값 치환
-        if user_option['difficulty'] == '상':
-            user_option['difficulty'] = 3
-        elif user_option['difficulty'] == '중':
-            user_option['difficulty'] = 2
-        elif user_option['difficulty'] == '하':
-            user_option['difficulty'] = 1
-        else:
-            user_option['difficulty'] = None
-        #공포도 값 치환
-        if user_option['fear'] == '상':
-            user_option['fear'] = 3
-        elif user_option['fear'] == '중':
-            user_option['fear'] = 2
-        elif user_option['fear'] == '하':
-            user_option['fear'] = 1
-        else:
-            user_option['fear'] = None
-        #활동성 값 치환
-        if user_option['activity'] == '상':
-            user_option['activity'] = 3
-        elif user_option['activity'] == '중':
-            user_option['activity'] = 2
-        elif user_option['activity'] == '하':
-            user_option['activity'] = 1
-        else:
-            user_option['activity'] = None
-
-        rooms = Room.objects.all()
-
-        for room in rooms:
-            room.date = int(room.date.replace('.', ''))
-
-
-
-        filtered_rooms = []
-        #filtered_rooms가 장르랑 난,공,활 유사도 측정해야햐는 방들
-
-        for room in rooms:
-            for i in range(1, 4):
-                if room.region == user_option[f'area{i}']:
-                    if room.date >= user_option['startdate'] and room.date <= user_option['enddate']:
-                        filtered_rooms.append(room)
-                    break  # 일치하는 경우를 찾았으므로 루프를 종료합니다.
-
-        filtered_genre_similarity = []
-
-        genre_similarity=[[1,0,0.6604,0,0,0,0,0.5007,0,0.7116],
-                          [0,1,0,0.3459,0,0,0,0,0,0],
-                          [0.6604,0,1,0,0,0,0.042,0.1507,0.0503,0.1823],
-                          [0,0.3459,0,1,0,0.2879,0,0,0,0],
-                          [0,0,0,0,1,0,0.6037,0.2711,0.7465,0.4714],
-                          [0,0,0,0.288,0,1,0,0,0.0855,0],
-                          [0,0,0.042,0,0.6037,0,1,0.365,0.3394,0],
-                          [0.5007,0,0.1507,0,0.2711,0,0.365,1,0.0564,0.6076],
-                          [0,0,0.0503,0,0.7465,0.0855,0.3394,0.0564,1,0],
-                          [0.7116,0,0.1823,0,0.4714,0,0,0.6076,0,1]
-                          ]
-
-        if user_option['genre'] == -1:
-            for room in filtered_rooms:
-                new_array = [room.roomID, 0]
-                filtered_genre_similarity.append(new_array)
-        else:
-            for room in filtered_rooms:
-                column_index = room.genre
-                similarity_value = genre_similarity[user_option['genre']][column_index]
-                new_array = [room.roomID, similarity_value]
-                filtered_genre_similarity.append(new_array)
-
-        #null값인 property 구별용 변수
-        diff_null=0
-        horr_null=0
-        acti_null=0
-
-        #어떤 property가 null값인지 구별
-        if user_option.get('difficulty') is None:
-            diff_null=1
-        if user_option.get('fear') is None:
-            horr_null=1
-        if user_option.get('activity') is None:
-            acti_null=1
-        count = diff_null+horr_null+acti_null
-        print("확인용 출력: ", diff_null, horr_null, acti_null)
-
-
-        property_similarity=[]
-
-        #null값인 property가 몇개인지 검사
-
-        if count==0: #null값이 하나도 없을때
-
-            #rooms배열에서 각 행마다 반복 -> 난공활 정보 가져오기
-            for room in filtered_rooms:
-                room_diff = room.difficulty
-                room_horr = room.fear
-                room_acti = room.activity
-
-                #np용 배열로 저장
-                room_vector = np.array([room_diff, room_horr, room_acti])
-                user_vector = np.array([user_option['difficulty'], user_option['fear'], user_option['activity']])
-
-                #유클리드 거리 계산
-                euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                similarity = 1 / (1 + euclidean_distance)
-                new_array = [room.roomID, similarity]
-                #방1개에 대한 최종 유사도는 배열로 저장해준다
-                property_similarity.append(new_array)
-                print(property_similarity)
-
-        elif count==1: #null값이 하나만 있을 때
-            if diff_null==1: #null값이 난이도일때
-                for room in filtered_rooms:
-                    room_horr = room.fear
-                    room_acti = room.activity
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_horr, room_acti])
-                    user_vector = np.array([user_option['fear'], user_option['activity']])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room.방ID, similarity]
-                    #방1개에 대한 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-            elif horr_null==1: #null값이 공포도일때
-                for room in filtered_rooms:
-                    room_diff = room.difficulty
-                    room_acti = room.activity
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_diff, room_acti])
-                    user_vector = np.array([user_option['difficulty'], user_option['activity']])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room.방ID, similarity]
-                    #방1개에 대한 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-            elif acti_null==1:
-                for room in filtered_rooms:
-                    room_diff = room.difficulty
-                    room_horr = room.fear
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_diff, room_horr])
-                    user_vector = np.array([user_option['difficulty'], user_option['fear']])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room.roomID, similarity]
-                    #방1개마다 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-
-        elif count==2: #null값이 2개일때
-            if diff_null==1 and horr_null==1: #활동성 값만 계산해주면 될때
-                for room in filtered_rooms:
-                    room_acti = room.activity
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_acti])
-                    user_vector = np.array([user_option['activity']])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room.roomID, similarity]
-                    #방1개마다 대한 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-            elif diff_null==1 and acti_null==1: #공포도 값만 계산해주면 될때
-                for room in filtered_rooms:
-                    room_horr = room.fear
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_horr])
-                    user_vector = np.array([user_option.horror])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room[0], similarity]
-                    #방1개마다 대한 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-            elif horr_null==1 and acti_null==1: #난이도 값만 계산해주면 될때
-                for room in filtered_rooms:
-                    room_diff = room.difficulty
-
-                    #np용 배열로 저장
-                    room_vector = np.array([room_diff])
-                    user_vector = np.array([user_option['difficulty']])
-
-                    #유클리드 거리 계산
-                    euclidean_distance = np.linalg.norm(room_vector - user_vector)
-                    similarity = 1 / (1 + euclidean_distance)
-                    new_array = [room.roomID, similarity]
-                    #방1개마다 대한 최종 유사도는 배열로 저장해준다
-                    property_similarity.append(new_array)
-                    print(property_similarity)
-
-        elif count==3:
-            for room in filtered_rooms:
-                new_array = [room.방ID, 0]
-                property_similarity.append(new_array)
-
-        if all(value == 0 for _, value in filtered_genre_similarity) and count == 3:
-            random_room = random.sample(rooms, 3)
-            print("랜덤으로 추천드리는 방입니다: ")
-            for room in random_room:
-                print(room.roomID, room.region, room.date, room.genre, room.difficulty, room.fear, room.activity)
-        else :
-            # filtered_genre_similarity와 property_similarity에서 방 ID와 유사도 값을 가져옴
-            room_IDs = [item[0] for item in filtered_genre_similarity]
-            genre_values = np.array([item[1] for item in filtered_genre_similarity])
-            property_values = np.array([item[1] for item in property_similarity])
-            print(len(genre_values))
-            print(len(property_values))
-
-            # 방 ID별로 유사도 값들을 합산
-            sum_similarity = genre_values + property_values
-
-            # 유사도 값들의 표준 편차 계산
-            total_similarity = np.concatenate((genre_values, property_values))
-            total_similarity = np.reshape(total_similarity, (2, len(room_IDs)))
-            total_similarity_std = total_similarity.std(axis=0)
-
-            # 유사도 값들의 합에서 표준 편차를 뺀 결과를 2차원 배열로 저장
-            modified_values = np.column_stack((room_IDs, sum_similarity - total_similarity_std))
-            # modified_values를 크기순으로 정렬하여 상위 3개 방 추천
-            recommended_rooms_id = modified_values[np.argsort(modified_values[:, 1])[::-1]][:3]
-            recommended_rooms=[]
-
-            for room in filtered_rooms:
-                for item in recommended_rooms_id:
-                    if room.roomID== item[0]:
-                        recommended_rooms.append(room)
-                        break
-
-
-            for room in recommended_rooms:
-                room_data = {
-                    'roomID': room.roomID,
-                    'title': room.title,
-                    'roomIntro': room.roomIntro,
-                    'date': room.date,
-                    'region': room.region,
-                    'genre': room.genre,
-                    'difficulty': room.difficulty,
-                    'fear': room.fear,
-                    'activity': room.activity,
-                }
-                RoomViewSet.response_data.append(room_data)
-
-            return Response({'success': True}, status=status.HTTP_200_OK)
-
 
     @api_view(['GET'])
-    def getroomlist(request):
-        final_response_data = RoomViewSet.response_data
-        if len(final_response_data) > 0:
-            print(len(final_response_data))
-            response_data = {
-                'success': True,
-                'data': final_response_data,
-                # 'roomId' : final_response_data.roomID
-                'roomId' : final_response_data[0]['roomID']
-                # 'roomId' : final_response_data
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            print(len(final_response_data))
-            response_data = {
-                'success': False,
-                'data': []
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+    def chatroomlist(request):
+        chatroom_list = ChatRoom.objects.filter(userID = request.data.get('userID'))
+        serializer = ChatRoomSerializer(chatroom_list, many=True)
+        return Response(serializer.data)
 
 
-    @api_view(['POST'])
-    def enterroomlist(request):
-        user_id = request.session.get('user_id')
-        room_id = request.data.get('room_id')
 
-        if user_id and room_id:
-            try:
-                user = AppUser.objects.get(id = user_id)
-                room_index = int(room_id) - 1   # 방의 인덱스를 계산 (0부터 시작)
-                if room_index >= 0 and room_index < len(user.roomID):
-                    user.roomID = user.roomID[:room_index] + '1' + user.roomID[room_index+1:]  # 해당 위치에 1로 업데이트
-                    user.save()
-                    return Response({'success': True}, status=status.HTTP_200_OK)
-                else:
-                    return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
-            except AppUser.DoesNotExist:
-                return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
+# 채팅 내역 저장 - 보낼때마다 저장
+# 채팅 내역 불러오기
 
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
+
+    @api_view(['POST'])
+    def savemessage(request):
+        CHistoryID = request.data.get('CHistoryID')
+        senderID = request.data.get('senderID')
+
+        try:
+            chatroom = ChatRoom.objects.get(senderID=senderID)
+            receiverID = chatroom.userID2
+        except ChatRoom.DoesNotExist:
+            return Response({'success': False, 'error': 'ChatRoom not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        content = request.data.get('content')
+        timestamp = request.data.get('timestamp')
+
+        if CHistoryID and senderID and receiverID and content and timestamp:
+            chat_count = Chat.objects.count() + 1
+            chat = Chat.objects.create(messageID = chat_count, CHistoryID = CHistoryID,
+                                       senderID = senderID, receiverID = receiverID,
+                                       content = content, timestamp = timestamp)
+            chat.save()
+
+            chatroom = ChatRoom.objects.filter(HistoryID = CHistoryID)
+            chatroom.update(AccessedTime=timestamp, recentMessage=content)
+            chatroom.save()
+
+            return_chat = Chat.objects.filter(timestamp = timestamp)
+
+            # 새로운 메세지 저장시, 채팅방의 AccessedTime과 recentMessage도 업데이트
+            # 새로운 메세지 자체도 반환
+            return Response({'success': True, 'chat': ChatSerializer(return_chat, many=True).data},
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+
+    @api_view(['GET'])
+    def getchathistory(request):
+        CHistoryID = request.data.get('CHistoryID')
+        if CHistoryID is None:
+            return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            chat_history = Chat.objects.filter(CHistoryID = CHistoryID).order_by('timestamp')
+            serializer = ChatSerializer(chat_history, many=True)
+            return Response(serializer.data)
+        except Chat.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 
@@ -554,6 +195,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
+    # KSH : 사용자 정보 생성 기능
     @api_view(['POST'])
     def profilecreate(request):
         userId = request.data.get('userId')
@@ -575,8 +217,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
         cleanliness = request.data.get('cleanliness')
         noiseSens = request.data.get('noiseSens')
         sleepSche = request.data.get('sleepSche')
+        upSche = request.data.get('upSche')
 
-        if userId and Embti and Smbti and Tmbti and Jmbti and firstLesson and smoke and sleepHabit and grade and shareNeeds and inComm and heatSens and coldSens and drinkFreq and cleanliness and noiseSens and sleepSche:
+        if (userId and Embti and Smbti and Tmbti and Jmbti and firstLesson and smoke and sleepHabit
+                and grade and shareNeeds and inComm and heatSens and coldSens and drinkFreq
+                and cleanliness and noiseSens and sleepSche and upSche):
 
             user_count = Profile.objects.count() + 1
             user_profile = Profile.objects.create(profileId = user_count, userId = userId,
@@ -595,7 +240,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
                                                   drinkFreq = drinkFreq,
                                                   cleanliness = cleanliness,
                                                   noiseSens = noiseSens,
-                                                  sleepSche = sleepSche)
+                                                  sleepSche = sleepSche,
+                                                  upSchel = upSche)
             user_profile.save()
 
             user = AppUser.objects.get(userID = userId)
@@ -606,6 +252,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         else:
             return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
+    # KSH : 사용자 정보 수정 기능
     @api_view(['PATCH'])
     def profileupdate(request):
         userId = request.data.get('userId')
@@ -627,8 +274,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
         cleanliness = request.data.get('cleanliness')
         noiseSens = request.data.get('noiseSens')
         sleepSche = request.data.get('sleepSche')
+        upSche = request.data.get('upSche')
 
-        if userId and Embti and Smbti and Tmbti and Jmbti and firstLesson and smoke and sleepHabit and grade and shareNeeds and inComm and heatSens and coldSens and drinkFreq and cleanliness and noiseSens and sleepSche:
+        if (userId and Embti and Smbti and Tmbti and Jmbti and firstLesson and smoke and sleepHabit
+                and grade and shareNeeds and inComm and heatSens and coldSens and drinkFreq
+                and cleanliness and noiseSens and sleepSche and upSche):
 
             user_profile = Profile.objects.get(userId = userId)
             user_profile.Embti = Embti
@@ -647,6 +297,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             user_profile.cleanliness = cleanliness
             user_profile.noiseSens = noiseSens
             user_profile.sleepSche = sleepSche
+            user_profile.upSche = upSche
             user_profile.save()
 
             return Response({'success': True}, status=status.HTTP_200_OK)
@@ -658,15 +309,19 @@ class UserPrefViewSet(viewsets.ModelViewSet):
     queryset = UserPref.objects.all()
     serializer_class = UPrefSerializer
 
+    # KSH : 사용자 선호도 정보 생성 기능
     @api_view(['POST'])
     def userprefcreate(request):
         UuserId = request.data.get('UuserId')
 
-        Umbti = request.data.get('Umbti')
+        UEmbti = request.data.get('UEmbti')
+        USmbti = request.data.get('USmbti')
+        UTmbti = request.data.get('UTmbti')
+        UJmbti = request.data.get('UJmbti')
+
         UfirstLesson = request.data.get('UfirstLesson')
         Usmoke = request.data.get('Usmoke')
         UsleepHabit = request.data.get('UsleepHabit')
-        Ugrade = request.data.get('Ugrade')
         Ugrade = request.data.get('Ugrade')
         UshareNeeds = request.data.get('UshareNeeds')
         UinComm = request.data.get('UinComm')
@@ -676,11 +331,16 @@ class UserPrefViewSet(viewsets.ModelViewSet):
         Ucleanliness = request.data.get('Ucleanliness')
         UnoiseSens = request.data.get('UnoiseSens')
         UsleepSche = request.data.get('UsleepSche')
+        UupSche = request.data.get('UupSche')
 
-        if UuserId and Umbti and UfirstLesson and Usmoke and UsleepHabit and Ugrade and UshareNeeds and UinComm and UheatSens and UcoldSens and UdrinkFreq and Ucleanliness and UnoiseSens and UsleepSche:
+        if (UuserId and UEmbti and USmbti and UTmbti and UJmbti and UfirstLesson and Usmoke
+                and UsleepHabit and Ugrade and UshareNeeds and UinComm and UheatSens and UcoldSens
+                and UdrinkFreq and Ucleanliness and UnoiseSens and UsleepSche and UupSche):
+
             user_count = UserPref.objects.count() + 1
             user_pref = UserPref.objects.create(prefId = user_count, UuserId = UuserId,
-                                                Umbti = Umbti,
+                                                UEmbti = UEmbti, USmbti = USmbti,
+                                                UTmbti = UTmbti, UJmbti = UJmbti,
                                                 UfirstLesson = UfirstLesson,
                                                 Usmoke = Usmoke,
                                                 UsleepHabit = UsleepHabit,
@@ -692,7 +352,8 @@ class UserPrefViewSet(viewsets.ModelViewSet):
                                                 UdrinkFreq = UdrinkFreq,
                                                 Ucleanliness = Ucleanliness,
                                                 UnoiseSens = UnoiseSens,
-                                                UsleepSche = UsleepSche)
+                                                UsleepSche = UsleepSche,
+                                                UupSche = UupSche)
             user_pref.save()
 
             user = AppUser.objects.get(userID = UuserId)
@@ -702,12 +363,17 @@ class UserPrefViewSet(viewsets.ModelViewSet):
             return Response({'success': True}, status=status.HTTP_201_CREATED)
         else:
             return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    # KSH : 사용자 선호도 정보 수정 기능
     @api_view(['PATCH'])
     def userprefupdate(request):
         UuserId = request.data.get('UuserId')
 
-        Umbti = request.data.get('Umbti')
+        UEmbti = request.data.get('UEmbti')
+        USmbti = request.data.get('USmbti')
+        UTmbti = request.data.get('UTmbti')
+        UJmbti = request.data.get('UJmbti')
+
         UfirstLesson = request.data.get('UfirstLesson')
         Usmoke = request.data.get('Usmoke')
         UsleepHabit = request.data.get('UsleepHabit')
@@ -720,10 +386,19 @@ class UserPrefViewSet(viewsets.ModelViewSet):
         Ucleanliness = request.data.get('Ucleanliness')
         UnoiseSens = request.data.get('UnoiseSens')
         UsleepSche = request.data.get('UsleepSche')
+        UupSche = request.data.get('UupSche')
 
-        if UuserId and Umbti and UfirstLesson and Usmoke and UsleepHabit and Ugrade and UshareNeeds and UinComm and UheatSens and UcoldSens and UdrinkFreq and Ucleanliness and UnoiseSens and UsleepSche:
+
+        if (UuserId and UEmbti and USmbti and UTmbti and UJmbti and UfirstLesson and Usmoke
+                and UsleepHabit and Ugrade and UshareNeeds and UinComm and UheatSens and UcoldSens
+                and UdrinkFreq and Ucleanliness and UnoiseSens and UsleepSche and UupSche):
+
             user_pref = UserPref.objects.get(UuserId = UuserId)
-            user_pref.Umbti = Umbti
+            user_pref.UEmbti = UEmbti
+            user_pref.USmbti = USmbti
+            user_pref.UTmbti = UTmbti
+            user_pref.UJmbti = UJmbti
+
             user_pref.UfirstLesson = UfirstLesson
             user_pref.Usmoke = Usmoke
             user_pref.UsleepHabit = UsleepHabit
@@ -736,6 +411,8 @@ class UserPrefViewSet(viewsets.ModelViewSet):
             user_pref.Ucleanliness = Ucleanliness
             user_pref.UnoiseSens = UnoiseSens
             user_pref.UsleepSche = UsleepSche
+            user_pref.UupSche = UupSche
+
             user_pref.save()
 
             return Response({'success': True}, status=status.HTTP_200_OK)
@@ -747,6 +424,197 @@ class UserPrefViewSet(viewsets.ModelViewSet):
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
+    
+    # KSH : 매칭+매칭결과 저장 알고리즘
+    @api_view(['POST'])
+    def matching(request):
+        userId = request.data.get('userId')
+
+        # 현재 사용자를 가져옴
+        user = AppUser.objects.get(userID=userId)
+        # 사용자의 선호도를 가져옴
+        user_pref = UserPref.objects.get(UuserId=userId)
+
+        # 조건에 맞는 사용자 리스트 가져옴
+        user_list = AppUser.objects.exclude(userID=userId).filter(
+            gender=user.gender,
+            matchStatus='pending',
+            isProfile=True,
+            isUserPref=True,
+            isRestricted=False
+        )
+
+        # OYJ : 매칭 알고리즘 추가
+        # 이진 필드와 연속 필드를 정의
+        binary_fields = ['Embti', 'Smbti', 'Tmbti', 'Jmbti', 'firstLesson', 'smoke', 'sleepHabit', 'shareNeeds', 'inComm', 'heatSens', 'coldSens']
+        continuous_fields = ['grade', 'drinkFreq', 'cleanliness', 'noiseSens', 'sleepSche', 'upSche',]
+
+        Ubinary_fields = ['UEmbti', 'USmbti', 'UTmbti', 'UJmbti', 'UfirstLesson', 'Usmoke', 'UsleepHabit', 'UshareNeeds', 'UinComm', 'UheatSens', 'UcoldSens']
+        Ucontinuous_fields = ['Ugrade', 'UdrinkFreq', 'Ucleanliness', 'UnoiseSens', 'UsleepSche', 'UupSche']
+
+
+        # 자카드 유사도를 계산하는 함수
+        def calculate_jaccard_similarity(user_pref, profile, Ubinary_fields, binary_fields):
+            user_pref_data = [getattr(user_pref, field) for field in Ubinary_fields]  # user_pref 객체의 binary_fields 필드 값을 가져옴
+            profile_data = [getattr(profile, field) for field in binary_fields]  # profile 객체의 binary_fields 필드 값을 가져옴
+            return jaccard_score(user_pref_data, profile_data)
+
+        # 유클리드 유사도를 계산하는 함수
+        def calculate_euclidean_similarity(user_pref, profile, Ucontinuous_fields, continuous_fields):
+            user_pref_data = [getattr(user_pref, field) for field in Ucontinuous_fields]  # user_pref 객체의 continuous_fields 필드 값을 가져옴
+            profile_data = [getattr(profile, field) for field in continuous_fields]  # profile 객체의 continuous_fields 필드 값을 가져옴
+            return euclidean(user_pref_data, profile_data)
+
+        # 사용자 매칭을 수행하는 함수
+        def match_users(user_pref, potential_matches, Ubinary_fields, Ucontinuous_fields,
+                        binary_fields, continuous_fields, weight_binary=0.5, weight_continuous=0.5):
+            similarities = []  # 유사도 저장을 위한 리스트 초기화
+            for match in potential_matches:  # 각 잠재적 매칭 사용자에 대해 반복
+                match_profile = Profile.objects.get(userId=match.userID)  # 잠재적 매칭 사용자의 프로필을 가져옴
+
+                jaccard_sim = calculate_jaccard_similarity(user_pref, match_profile, Ubinary_fields, binary_fields)  # 자카드 유사도를 계산
+                euclidean_sim = calculate_euclidean_similarity(user_pref, match_profile, Ucontinuous_fields, continuous_fields)  # 유클리드 유사도를 계산
+
+                combined_similarity = weight_binary * jaccard_sim + weight_continuous * (1 / (1 + euclidean_sim))  # 자카드 유사도와 유클리드 유사도를 결합
+                similarities.append((match, combined_similarity))  # 유사도를 잠재적 매칭 사용자와 함께 리스트에 추가
+
+            similarities.sort(key=lambda x: x[1], reverse=True)  # 유사도에 따라 내림차순으로 정렬
+            return [match for match, similarity in similarities[:5]]  # 상위 5명의 매칭 사용자를 반환
+
+        # 상위 매칭 사용자를 찾음
+        top_matches = match_users(user_pref, user_list, binary_fields, continuous_fields)
+        match_resultlist = [match.userID for match in top_matches]
+
+        if match_resultlist:
+            try:
+                existing_match_result = Match.objects.get(userId=userId)
+                existing_match_result.updateAt = timezone.now()
+                existing_match_result.userId1 = match_resultlist[0]
+                existing_match_result.userId2 = match_resultlist[1]
+                existing_match_result.userId3 = match_resultlist[2]
+                existing_match_result.userId4 = match_resultlist[3]
+                existing_match_result.userId5 = match_resultlist[4]
+                existing_match_result.save()
+
+                return Response({'success': True}, status=status.HTTP_200_OK)
+            except Match.DoesNotExist:
+                match_count = Match.objects.count() + 1
+                match_result = Match.objects.create(matchId=match_count, userId=userId,
+                                             createdAt=timezone.now, updateAt=timezone.now,
+                                             userId1=match_resultlist[0], userId2=match_resultlist[1],
+                                             userId3=match_resultlist[2], userId4=match_resultlist[3],
+                                             userId5=match_resultlist[4])
+                match_result.save()
+
+                return Response({'success': True}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # KSH : 매칭결과 조회 기능 추가
+    @api_view(['GET'])
+    def getmatchresult(request):
+        userId = request.data.get('userId')
+
+        try:
+            match_result = Match.objects.get(userId=userId)
+
+            user1 = AppUser.objects.get(userID=match_result.userId1)
+            user2 = AppUser.objects.get(userID=match_result.userId2)
+            user3 = AppUser.objects.get(userID=match_result.userId3)
+            user4 = AppUser.objects.get(userID=match_result.userId4)
+            user5 = AppUser.objects.get(userID=match_result.userId5)
+
+            # 반환 정보 수정 필요
+            response_data = {
+                'user1': {'userID': user1.userID, 'name': user1.name, 'studentId': user1.studentId},
+                'user2': {'userID': user2.userID, 'name': user2.name, 'studentId': user2.studentId},
+                'user3': {'userID': user3.userID, 'name': user3.name, 'studentId': user3.studentId},
+                'user4': {'userID': user4.userID, 'name': user4.name, 'studentId': user4.studentId},
+                'user5': {'userID': user5.userID, 'name': user5.name, 'studentId': user5.studentId}
+            }
+
+            return Response({'match_result': response_data}, status=status.HTTP_200_OK)
+
+        except Match.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+        except AppUser.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+
+    # KSH : 매칭 요청 기능 추가
+    @api_view(['POST'])
+    def matchrequest(request):
+        userId = request.data.get('userId')
+        Muser = ChatRoom.objects.get(user1=userId)
+        MuserId = Muser.user2
+
+        try:
+            match_result = Match.objects.get(userId=userId)
+            match_result.matchStatus = 'matching'
+
+            Mmatch_result = Match.objects.get(userId=MuserId)
+            Mmatch_result.matchStatus = 'matching'
+
+            match_result.save()
+            Mmatch_result.save()
+
+            return Response({'success': True}, status=status.HTTP_200_OK)
+        except Match.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+
+    # KSH : 매칭 수락 기능 추가
+    @api_view(['POST'])
+    def matchaccept(request):
+        userId = request.data.get('userId')
+        Muser = ChatRoom.objects.get(user1=userId)
+        MuserId = Muser.user2
+
+        try:
+            match_result = Match.objects.get(userId=userId)
+            match_result.matchStatus = 'accepted'
+
+            Mmatch_result = Match.objects.get(userId=MuserId)
+            Mmatch_result.matchStatus = 'accepted'
+
+            match_result.save()
+            Mmatch_result.save()
+
+            return Response({'success': True}, status=status.HTTP_200_OK)
+        except Match.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+
+    # KSH : 매칭 거절 기능 추가
+    @api_view(['POST'])
+    def matchreject(request):
+        userId = request.data.get('userId')
+        Muser = ChatRoom.objects.get(user1=userId)
+        MuserId = Muser.user2
+
+        try:
+            match_result = Match.objects.get(userId=userId)
+            match_result.matchStatus = 'pending'
+
+            Mmatch_result = Match.objects.get(userId=MuserId)
+            Mmatch_result.matchStatus = 'pending'
+
+            match_result.save()
+            Mmatch_result.save()
+
+            return Response({'success': True}, status=status.HTTP_200_OK)
+        except Match.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+       
+
+
+
+
+
+
 
 
 
@@ -755,17 +623,22 @@ class MatchViewSet(viewsets.ModelViewSet):
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
-
+    
+    # KSH : 유저 신고 기능 추가
     @api_view(['POST'])
     def reportuser(request):
         reporterId = request.data.get('reporterId')
         reason = request.data.get('reason')
         timestamp = request.data.get('timestamp')
-        reportedId = request.data.get('reportedId')
+
+        reportedId = ChatRoom.objects.get('reportedId')
+        reportedId = reportedId.user2
 
         if reporterId and reason and timestamp and reportedId:
             report_count = Report.objects.count() + 1
-            report = Report.objects.create(reportId = report_count, reporterId = reporterId, reason = reason, timestamp = timestamp, reportedId = reportedId)
+            report = Report.objects.create(reportId = report_count, reporterId = reporterId,
+                                           reason = reason, timestamp = timestamp,
+                                           reportedId = reportedId)
             report.save()
             return Response({'success': True}, status=status.HTTP_201_CREATED)
         else:
@@ -784,7 +657,9 @@ class BlockViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             timestamp = request.data.get('timestamp')
             blockerId = request.data.get('blockerId')
-            blockedId = request.data.get('blockedId')
+
+            blockedId = ChatRoom.objects.get('blockedId')
+            blockedId = blockedId.user2
 
             if timestamp and blockerId and blockedId:
                 block_count = Block.objects.count() + 1
@@ -806,3 +681,21 @@ class BlockViewSet(viewsets.ModelViewSet):
                     return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+    # KSH : 차단목록 조회 기능 추가
+    @api_view(['GET'])
+    def getblocklist(request):
+        blockerId = request.data.get('blockerId')
+
+        try:
+            block_list = Block.objects.filter(blockerId = blockerId)
+
+            block_user_list = []
+            for block in block_list:
+                block_user = AppUser.objects.get(userID = block.blockedId)
+                block_user_list.append(block_user)
+
+            return Response({'block_list': block_user_list}, status=status.HTTP_200_OK)
+
+        # 차단한 유저가 없을 때 우선 404로 처리하였음
+        except Block.DoesNotExist:
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)

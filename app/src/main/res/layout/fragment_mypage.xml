@@ -128,7 +128,7 @@
 
             <!-- 학번 -->
             <TextView
-                android:id="@+id/student_id"
+                android:id="@+id/StudentID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard"
